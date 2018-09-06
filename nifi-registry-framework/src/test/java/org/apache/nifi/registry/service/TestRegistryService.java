@@ -127,7 +127,7 @@ public class TestRegistryService {
         registryService.createBucket(bucket);
     }
 
-    @Test(expected = ConstraintViolationException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testCreateBucketWithMissingName() {
         final Bucket bucket = new Bucket();
         when(metadataService.getBucketsByName(bucket.getName())).thenReturn(Collections.emptyList());

@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 package org.apache.nifi.registry.service;
-
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.nifi.registry.bucket.Bucket;
@@ -56,6 +56,7 @@ import javax.validation.Validator;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.Base64;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -120,8 +121,12 @@ public class RegistryService {
             throw new IllegalArgumentException("Bucket cannot be null");
         }
 
+        if (bucket.getName() == null) {
+            throw new IllegalArgumentException("Bucket Name cannot be null");
+        }
+
         // set an id, the created time, and clear out the flows since its read-only
-        bucket.setIdentifier(UUID.randomUUID().toString());
+        bucket.setIdentifier(Base64.getEncoder().encodeToString(DigestUtils.md5(bucket.getName())));
         bucket.setCreatedTimestamp(System.currentTimeMillis());
 
         validate(bucket, "Cannot create Bucket");
