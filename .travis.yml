@@ -16,7 +16,7 @@
 language: java
 
 env:
-    - USER_LANGUAGE=en USER_REGION=US'
+    - USER_LANGUAGE=en USER_REGION=US VERSION="0.3.${TRAVIS_BUILD_NUMBER}"
 
 os: linux
 
@@ -34,7 +34,7 @@ before_cache:
     - rm -rf $HOME/.m2/repository/org/apache/nifi-registry/
 
 addons:
-    chrome: stable
+  chrome: stable
 
 # before_install aids in setting up the Travis-CI environment
 #   1. Configures pre-installed Chrome on Travis CI to be used in “headless” mode
@@ -53,5 +53,21 @@ install: true
 
 #build commands
 script:
-    - mvn -T 2C clean install -Pintegration-tests,contrib-check,jsUnitTests
-    - ls -al
+    - mvn -T 2C clean install -DskipTests -Dmaven.test.skip=true -Pintegration-tests,contrib-check,jsUnitTests
+
+before_deploy:
+    - git config --local user.name "Ruslan Khozinov"
+    - git config --local user.email "ruslan.khozinov@gmail.com"
+    - git tag ${VERSION}
+
+deploy:
+    provider: releases
+    api_key:
+      secure: "C0fx0hiin8+Hx8H8uX7kIut/ljsH5hrUjzUFpmZhX7AFYHyV5Ds0UoQJmJ/2/nQUoj9zkVRcbTmjG5OtXCtPEHuQ/+KBKnDGIIcDxs8yX1kzEnNcA99v3ZfGjXykpRYP94cPl7nzFUc/ey2tHBXTd64E8Pp38w2GdIbper8XgIL/oji6nBJCOwjmun2KIshseP2IroCXDKM2RcaxrCld3u1WEabyD8HmOPf+9zD/VFOOhhRNlOlP0ubFgvhqCqs/A6qkoCp9FMXF5KkUW+Rao5SoKt4Ybw4YvtzC1U5CvLRtgQ+yPAmYlCL+9PmhvxLcaLLf32uSmPgxGBT0iZobuyJe+oE47F92AxFi00KLKt1tJlyAGRNy2JeuShMjslwW6ae8HLWLgtQwP8gwZElcrliZzzYmdFUFCTZgb8Qjwvnp76yJxesX9VufEzhgyBJ16srXA0bMbXOAZbbMc2INAo+Mch+q6Qk90Ft6qHbcpzg0SYV4P5eABZYNPkeuGB9MqV0JDBrJxgqs+BxPb0jyad8dYmOqFu5AEE1Bo6JezYFHzwT8wIp75acR3YqGpFHPKYgOC5iSPVqkoLhhTpbR1mc9u3chnfw5IpNGJ+A7kcmFWazLX3aEvJFfltHcA3rTHyZ4bZFybuNJdoG3JWvgkjmPrsSA0t9Ppfp3dCS2Hd8="
+    skip_cleanup: true
+    file: 
+        - "./nifi-registry-assembly/target/nifi-registry-${VERSION}-bin.*"
+    on:
+        repo: ${TRAVIS_REPO_SLUG}
+        branch: "*"
+        tags: false

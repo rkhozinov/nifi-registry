@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.apache.nifi.registry</groupId>
         <artifactId>nifi-registry</artifactId>
-        <version>0.3.0-SNAPSHOT</version>
+        <version>${env.VERSION}</version>
     </parent>
     
     <artifactId>nifi-registry-utils</artifactId>
